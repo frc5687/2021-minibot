@@ -17,13 +17,13 @@ public class AutoFirstChallenge extends SequentialCommandGroup {
   public AutoFirstChallenge(Drivetrain drivetrain) {
     addCommands(
         new DriveDistance(0.5, 18, drivetrain),
-        new TurnDegrees(0.5, -90, drivetrain),
+        new TurnDegrees(0.5, -90, .5,  drivetrain),
         new DriveDistance(0.5, 21, drivetrain),
-        new TurnDegrees(0.5, -145, drivetrain),
+        new TurnDegrees(0.5, -145, .5, drivetrain),
         new DriveDistance(0.5, 29, drivetrain),
-        new TurnDegrees(0.5, 145, drivetrain),
+        new TurnDegrees(0.5, 145, .5, drivetrain),
         new DriveDistance(0.5, 21, drivetrain),
-        new TurnDegrees(0.5, 90, drivetrain),
+        new TurnDegrees(0.5, 90, .5, drivetrain),
         new DriveDistance(0.5, 18, drivetrain));
   }
 }
