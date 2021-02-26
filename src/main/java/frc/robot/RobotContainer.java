@@ -11,6 +11,8 @@ import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.AutoFirstChallenge;
 import frc.robot.commands.AutonomousDistance;
 import frc.robot.commands.AutonomousTime;
+import frc.robot.commands.DriveDistance;
+import frc.robot.commands.TurnDegrees;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.OnBoardIO;
 import frc.robot.subsystems.OnBoardIO.ChannelMode;
@@ -73,8 +75,10 @@ public class RobotContainer {
 
     // Setup SmartDashboard options
     m_chooser.setDefaultOption("Auto First Challenge", new AutoFirstChallenge(m_drivetrain));
-    m_chooser.addOption("Auto Routine Time", new AutonomousDistance(m_drivetrain));
-    m_chooser.addOption("Auto Routine Time", new AutonomousTime(m_drivetrain));
+    m_chooser.addOption("Turn Left 90deg", new TurnDegrees(0.375, -90, 0.5, m_drivetrain));
+    m_chooser.addOption("Turn Right 90deg", new TurnDegrees(0.375, 90, 0.5, m_drivetrain));
+    m_chooser.addOption("Turn Left 180deg", new TurnDegrees(0.375, -180, 0.5, m_drivetrain));
+    m_chooser.addOption("Drive 12 inches", new DriveDistance(0.5, 12, m_drivetrain));
     SmartDashboard.putData(m_chooser);
   }
 
@@ -95,5 +99,9 @@ public class RobotContainer {
   public Command getArcadeDriveCommand() {
     return new ArcadeDrive(
         m_drivetrain, () -> -m_controller.getRawAxis(1), () -> m_controller.getRawAxis(2));
+  }
+
+  public Drivetrain getDrivetrain() {
+    return m_drivetrain;
   }
 }
