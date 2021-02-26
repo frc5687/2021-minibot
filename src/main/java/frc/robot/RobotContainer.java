@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.ArcadeDrive;
+import frc.robot.commands.AutoFirstChallenge;
 import frc.robot.commands.AutonomousDistance;
 import frc.robot.commands.AutonomousTime;
 import frc.robot.commands.DriveDistance;
@@ -73,11 +74,11 @@ public class RobotContainer {
         .whenInactive(new PrintCommand("Button A Released"));
 
     // Setup SmartDashboard options
-    m_chooser.setDefaultOption("Turn Left 90deg", new TurnDegrees(0.375, -90, 0.5, m_drivetrain));
+    m_chooser.setDefaultOption("Auto First Challenge", new AutoFirstChallenge(m_drivetrain));
+    m_chooser.addOption("Turn Left 90deg", new TurnDegrees(0.375, -90, 0.5, m_drivetrain));
     m_chooser.addOption("Turn Right 90deg", new TurnDegrees(0.375, 90, 0.5, m_drivetrain));
     m_chooser.addOption("Turn Left 180deg", new TurnDegrees(0.375, -180, 0.5, m_drivetrain));
     m_chooser.addOption("Drive 12 inches", new DriveDistance(0.5, 12, m_drivetrain));
-    m_chooser.addOption("Auto Routine Time", new AutonomousTime(m_drivetrain));
     SmartDashboard.putData(m_chooser);
   }
 
