@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
+    m_robotContainer.getDrivetrain().resetGyro();
     // Get selected routine from the SmartDashboard
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 

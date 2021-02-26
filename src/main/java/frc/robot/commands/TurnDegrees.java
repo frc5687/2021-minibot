@@ -5,25 +5,32 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 public class TurnDegrees extends CommandBase {
   private final Drivetrain m_drive;
   private final double m_degrees;
+  private final double m_tolerance;
   private final double m_speed;
+
+  private double m_targetDegrees;
 
   /**
    * Creates a new TurnDegrees. This command will turn your robot for a desired rotation (in
    * degrees) and rotational speed.
    *
-   * @param speed The speed which the robot will drive. Negative is in reverse.
+   * @param speed The speed which the robot will drive. Should be positive-we'll adjust based on direction.
    * @param degrees Degrees to turn. Leverages encoders to compare distance.
+   * @param tolerance Amount of error (in degrees) to accept.
    * @param drive The drive subsystem on which this command will run
    */
-  public TurnDegrees(double speed, double degrees, Drivetrain drive) {
+  public TurnDegrees(double speed, double degrees, double tolerance, Drivetrain drive) {
     m_degrees = degrees;
-    m_speed = speed;
+    m_speed = Math.abs(speed);
     m_drive = drive;
+    m_tolerance = tolerance;
     addRequirements(drive);
   }
 
@@ -33,12 +40,26 @@ public class TurnDegrees extends CommandBase {
     // Set motors to stop, read encoder values for starting point
     m_drive.arcadeDrive(0, 0);
     m_drive.resetEncoders();
+    m_targetDegrees = m_drive.getGyroAngleZ() + m_degrees;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.arcadeDrive(0, m_speed);
+    double P = 0.1;
+    double turnSpeed = 0;
+    double gyroAngle = m_drive.getGyroAngleZ();
+    double error = m_targetDegrees - gyroAngle;
+    SmartDashboard.putNumber("gyroAngle",gyroAngle);
+    SmartDashboard.putNumber("error", error);
+    if (error < 0) {
+      turnSpeed = -Math.min(m_speed * Math.abs(error) * P, m_speed) ;
+    } else if(error>0) {
+      turnSpeed = Math.min(m_speed * Math.abs(error) * P, m_speed);
+    }
+    SmartDashboard.putNumber("turnSpeed", turnSpeed);
+
+    m_drive.arcadeDrive(0, turnSpeed);
   }
 
   // Called once the command ends or is interrupted.
@@ -50,14 +71,7 @@ public class TurnDegrees extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    /* Need to convert distance travelled to degrees. The Standard
-       Romi Chassis found here, https://www.pololu.com/category/203/romi-chassis-kits,
-       has a wheel placement diameter (149 mm) - width of the wheel (8 mm) = 141 mm
-       or 5.551 inches. We then take into consideration the width of the tires.
-    */
-    double inchPerDegree = Math.PI * 5.551 / 360;
-    // Compare distance travelled from start to distance based on degree turn
-    return getAverageTurningDistance() >= (inchPerDegree * m_degrees);
+    return Math.abs(m_drive.getGyroAngleZ() -  m_targetDegrees) <= m_tolerance;
   }
 
   private double getAverageTurningDistance() {
