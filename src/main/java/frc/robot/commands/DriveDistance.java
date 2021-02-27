@@ -5,12 +5,17 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 
 public class DriveDistance extends CommandBase {
   private final Drivetrain m_drive;
   private final double m_distance;
   private final double m_speed;
+
+  private final PIDController m_pidController;
 
   /**
    * Creates a new DriveDistance. This command will drive your your robot for a desired distance at
@@ -24,6 +29,9 @@ public class DriveDistance extends CommandBase {
     m_distance = inches;
     m_speed = speed;
     m_drive = drive;
+    m_pidController = new PIDController(0.1, 0.0, 0.01);
+    m_pidController.enableContinuousInput(-180, 180);
+    m_pidController.setTolerance(0.5);
     addRequirements(drive);
   }
 
@@ -32,12 +40,19 @@ public class DriveDistance extends CommandBase {
   public void initialize() {
     m_drive.arcadeDrive(0, 0);
     m_drive.resetEncoders();
+    m_pidController.reset();
+    m_drive.resetGyro();
+    m_pidController.setSetpoint(m_drive.getGyroAngleZ());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drive.arcadeDrive(m_speed, 0);
+    double yaw = m_drive.getGyroAngleZ();
+    SmartDashboard.putNumber("yaw", yaw);
+    double correction = m_pidController.calculate(yaw);
+    SmartDashboard.putNumber("correction", correction);
+    m_drive.arcadeDrive(m_speed, correction);
   }
 
   // Called once the command ends or is interrupted.
