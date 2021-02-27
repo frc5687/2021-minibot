@@ -17,6 +17,10 @@ public class DriveDistance extends CommandBase {
 
   private final PIDController m_pidController;
 
+  private final double kP = 0.085;
+  private final double kI = 0.001;
+  private final double kD = 0.00;
+
   /**
    * Creates a new DriveDistance. This command will drive your your robot for a desired distance at
    * a desired speed.
@@ -29,7 +33,10 @@ public class DriveDistance extends CommandBase {
     m_distance = inches;
     m_speed = speed;
     m_drive = drive;
-    m_pidController = new PIDController(0.1, 0.0, 0.01);
+    SmartDashboard.putNumber("DriveDistance/p", kP);
+    SmartDashboard.putNumber("DriveDistance/i", kI);
+    SmartDashboard.putNumber("DriveDistance/d", kD);
+    m_pidController = new PIDController(kP, kI, kD);
     m_pidController.enableContinuousInput(-180, 180);
     m_pidController.setTolerance(0.5);
     addRequirements(drive);
@@ -38,6 +45,12 @@ public class DriveDistance extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_pidController.setPID(
+      SmartDashboard.getNumber("DriveDistance/p", kP), 
+      SmartDashboard.getNumber("DriveDistance/i", kI), 
+      SmartDashboard.getNumber("DriveDistance/d", kD)
+    );
+
     m_drive.arcadeDrive(0, 0);
     m_drive.resetEncoders();
     m_pidController.reset();
@@ -49,7 +62,7 @@ public class DriveDistance extends CommandBase {
   @Override
   public void execute() {
     double yaw = m_drive.getGyroAngleZ();
-    SmartDashboard.putNumber("DriveDistance/yaw", yaw);
+    SmartDashboard.putNumber("DriveDistance/yaw", yaw/180);
     double correction = m_pidController.calculate(yaw);
     SmartDashboard.putNumber("DriveDistance/correction", correction);
     m_drive.arcadeDrive(m_speed, correction);
