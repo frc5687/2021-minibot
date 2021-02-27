@@ -21,8 +21,8 @@ public class TurnDegrees extends CommandBase {
 
   private double m_targetDegrees;
 
-  private final double kP = 0.025;
-  private final double kI = 0.0;
+  private final double kP = 0.008;
+  private final double kI = 0.005;
   private final double kD = 0.001;
 
   /**
