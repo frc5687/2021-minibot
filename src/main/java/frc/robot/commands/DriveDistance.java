@@ -17,8 +17,8 @@ public class DriveDistance extends CommandBase {
 
   private final PIDController m_pidController;
 
-  private final double kP = 0.02;
-  private final double kI = 0.00;
+  private final double kP = 0.085;
+  private final double kI = 0.001;
   private final double kD = 0.00;
 
   /**
@@ -62,7 +62,7 @@ public class DriveDistance extends CommandBase {
   @Override
   public void execute() {
     double yaw = m_drive.getGyroAngleZ();
-    SmartDashboard.putNumber("DriveDistance/yaw", yaw);
+    SmartDashboard.putNumber("DriveDistance/yaw", yaw/180);
     double correction = m_pidController.calculate(yaw);
     SmartDashboard.putNumber("DriveDistance/correction", correction);
     m_drive.arcadeDrive(m_speed, correction);
