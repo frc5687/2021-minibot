@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.utils.Utilities;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.util.function.Supplier;
 
@@ -38,7 +39,11 @@ public class ArcadeDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_drivetrain.arcadeDrive(m_xaxisSpeedSupplier.get(), m_zaxisRotateSupplier.get());
+    double speed = m_xaxisSpeedSupplier.get();
+    double rotation = m_zaxisRotateSupplier.get();
+    rotation = Utilities.applyDeadband(rotation, 0.01);
+    rotation = Utilities.applySensitivityFactor(rotation, 0.5);
+    m_drivetrain.arcadeDrive(speed, rotation);
   }
 
   // Called once the command ends or is interrupted.
