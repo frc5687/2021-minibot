@@ -51,14 +51,14 @@ public class TurnDegrees extends CommandBase {
     double turnSpeed = 0;
     double gyroAngle = m_drive.getGyroAngleZ();
     double error = m_targetDegrees - gyroAngle;
-    SmartDashboard.putNumber("gyroAngle",gyroAngle);
-    SmartDashboard.putNumber("error", error);
+    SmartDashboard.putNumber("TurnDegrees/gyroAngle",gyroAngle);
+    SmartDashboard.putNumber("TurnDegrees/error", error);
     if (error < 0) {
       turnSpeed = -Math.min(m_speed * Math.abs(error) * P, m_speed) ;
     } else if(error>0) {
       turnSpeed = Math.min(m_speed * Math.abs(error) * P, m_speed);
     }
-    SmartDashboard.putNumber("turnSpeed", turnSpeed);
+    SmartDashboard.putNumber("TurnDegrees/turnSpeed", turnSpeed);
 
     m_drive.arcadeDrive(0, turnSpeed);
   }
