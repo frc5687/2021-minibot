@@ -5,10 +5,12 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 public class DriveDistance extends CommandBase {
   private final Drivetrain m_drive;
@@ -56,6 +58,7 @@ public class DriveDistance extends CommandBase {
     m_pidController.reset();
     m_drive.resetGyro();
     m_pidController.setSetpoint(m_drive.getGyroAngleZ());
+    SmartDashboard.putString("AutoStep", "DriveDistance " + m_distance);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -64,6 +67,7 @@ public class DriveDistance extends CommandBase {
     double yaw = m_drive.getGyroAngleZ();
     SmartDashboard.putNumber("DriveDistance/yaw", yaw/180);
     double correction = m_pidController.calculate(yaw);
+    correction = MathUtil.clamp(correction, -0.5, 0.5);
     SmartDashboard.putNumber("DriveDistance/correction", correction);
     m_drive.arcadeDrive(m_speed, correction);
   }
@@ -72,6 +76,7 @@ public class DriveDistance extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_drive.arcadeDrive(0, 0);
+    SmartDashboard.putString("AutoStep", SmartDashboard.getString("AutoStep", "Unknown") + " Done");
   }
 
   // Returns true when the command should end.

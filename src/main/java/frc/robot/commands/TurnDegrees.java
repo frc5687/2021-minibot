@@ -25,6 +25,8 @@ public class TurnDegrees extends CommandBase {
   private final double kI = 0.005;
   private final double kD = 0.001;
 
+  private final double floor = 0.0;
+
   /**
    * Creates a new TurnDegrees. This command will turn your robot for a desired rotation (in
    * degrees) and rotational speed.
@@ -63,6 +65,7 @@ public class TurnDegrees extends CommandBase {
     m_drive.resetGyro();
     m_pidController.setSetpoint(m_degrees);
     m_targetDegrees = m_degrees;
+    SmartDashboard.putString("AutoStep", "TurnDegrees " + m_degrees);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -74,6 +77,11 @@ public class TurnDegrees extends CommandBase {
     SmartDashboard.putNumber("TurnDegrees/modyaw", modYaw);
     double pidOut = m_pidController.calculate(modYaw);
     double correction = MathUtil.clamp(pidOut, -m_speed, m_speed);
+    if (correction < 0 && correction > -floor) { 
+      correction = -floor;
+    } else if (correction > 0 && correction < floor) {
+      correction = floor;
+    }
     SmartDashboard.putNumber("TurnDegrees/pidOut", pidOut);
     SmartDashboard.putNumber("TurnDegrees/correction", correction);
 
@@ -84,6 +92,7 @@ public class TurnDegrees extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_drive.arcadeDrive(0, 0);
+    SmartDashboard.putString("AutoStep", SmartDashboard.getString("AutoStep", "Unknown") + " Done");
   }
 
   // Returns true when the command should end.
