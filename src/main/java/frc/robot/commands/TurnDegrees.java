@@ -77,11 +77,11 @@ public class TurnDegrees extends CommandBase {
     SmartDashboard.putNumber("TurnDegrees/modyaw", modYaw);
     double pidOut = m_pidController.calculate(modYaw);
     double correction = MathUtil.clamp(pidOut, -m_speed, m_speed);
-    if (correction < 0 && correction > -floor) { 
-      correction = -floor;
-    } else if (correction > 0 && correction < floor) {
-      correction = floor;
-    }
+    // if (correction < 0 && correction > -floor) { 
+    //   correction = -floor;
+    // } else if (correction > 0 && correction < floor) {
+    //   correction = floor;
+    // }
     SmartDashboard.putNumber("TurnDegrees/pidOut", pidOut);
     SmartDashboard.putNumber("TurnDegrees/correction", correction);
 

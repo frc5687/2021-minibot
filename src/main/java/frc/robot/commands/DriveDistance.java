@@ -67,9 +67,10 @@ public class DriveDistance extends CommandBase {
     double yaw = m_drive.getGyroAngleZ();
     SmartDashboard.putNumber("DriveDistance/yaw", yaw/180);
     double correction = m_pidController.calculate(yaw);
-    correction = MathUtil.clamp(correction, -0.5, 0.5);
+    correction = MathUtil.clamp(correction, -0.2, 0.2);
     SmartDashboard.putNumber("DriveDistance/correction", correction);
-    m_drive.arcadeDrive(m_speed, correction);
+    SmartDashboard.putNumber("DriveDistance/speed", m_speed);
+    m_drive.arcadeDrive(m_speed, 0);
   }
 
   // Called once the command ends or is interrupted.
