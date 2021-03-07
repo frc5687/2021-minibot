@@ -74,8 +74,8 @@ public class RobotContainer {
         .whenInactive(new PrintCommand("Button A Released"));
 
     // Setup SmartDashboard options
-    m_chooser.setDefaultOption("Auto First Challenge", new AutoFirstChallenge(m_drivetrain));
-    m_chooser.addOption("Turn Left 90deg", new TurnDegrees(0.5, -90, 1, m_drivetrain));
+    m_chooser.setDefaultOption("Turn Left 90deg", new TurnDegrees(1, -90, 0.5, m_drivetrain));
+    m_chooser.addOption("Auto First Challenge", new AutoFirstChallenge(m_drivetrain));
     m_chooser.addOption("Turn Right 90deg", new TurnDegrees(0.5, 90, 1, m_drivetrain));
     m_chooser.addOption("Turn Left 180deg", new TurnDegrees(0.5, -180, 1, m_drivetrain));
     m_chooser.addOption("Drive 12 inches", new DriveDistance(0.5, 12, m_drivetrain));

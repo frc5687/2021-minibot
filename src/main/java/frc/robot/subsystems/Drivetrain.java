@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.sensors.RomiGyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpiutil.math.MathUtil;
 
 public class Drivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;
@@ -45,6 +47,18 @@ public class Drivetrain extends SubsystemBase {
   public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
     m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
   }
+
+  public void setMotors(double leftSpeed, double rightSpeed) {
+
+    leftSpeed = MathUtil.clamp(leftSpeed, -1.0, 1.0);
+    rightSpeed = MathUtil.clamp(rightSpeed, -1.0, 1.0);
+
+    m_leftMotor.set(leftSpeed);
+    m_rightMotor.set(rightSpeed * -1);
+
+    m_diffDrive.feed();
+  }
+
 
   public void resetEncoders() {
     m_leftEncoder.reset();

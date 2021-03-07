@@ -21,9 +21,10 @@ public class TurnDegrees extends CommandBase {
 
   private double m_targetDegrees;
 
-  private final double kP = 0.008;
-  private final double kI = 0.005;
-  private final double kD = 0.001;
+  private final double kP = .30;
+  private final double kI = 0.0;
+  private final double kD = 0.01;
+  private double kF = 0.2;
 
   private final double floor = 0.0;
 
@@ -38,15 +39,16 @@ public class TurnDegrees extends CommandBase {
    */
   public TurnDegrees(double speed, double degrees, double tolerance, Drivetrain drive) {
     m_degrees = degrees;
-    m_speed = Math.abs(speed);
+    m_speed = Math.min(Math.abs(speed), 1.0);
     m_drive = drive;
     m_tolerance = tolerance;
     SmartDashboard.putNumber("TurnDegrees/p", kP);
     SmartDashboard.putNumber("TurnDegrees/i", kI);
     SmartDashboard.putNumber("TurnDegrees/d", kD);
+    SmartDashboard.putNumber("TurnDegrees/f", kF);
     m_pidController = new PIDController(kP, kI, kD);
-    m_pidController.enableContinuousInput(-180, 180);
-    m_pidController.setTolerance(tolerance);
+    m_pidController.enableContinuousInput(-1, 1);
+    m_pidController.setTolerance(tolerance / 180);
     addRequirements(drive);
   }
 
@@ -59,11 +61,12 @@ public class TurnDegrees extends CommandBase {
       SmartDashboard.getNumber("TurnDegrees/i", kI), 
       SmartDashboard.getNumber("TurnDegrees/d", kD)
     );
-    m_drive.arcadeDrive(0, 0);
+    kF = SmartDashboard.getNumber("TurnDegrees/f", kF);
+    m_drive.setMotors(0, 0);
     m_drive.resetEncoders();
     m_pidController.reset();
     m_drive.resetGyro();
-    m_pidController.setSetpoint(m_degrees);
+    m_pidController.setSetpoint(m_degrees/180);
     m_targetDegrees = m_degrees;
     SmartDashboard.putString("AutoStep", "TurnDegrees " + m_degrees);
   }
@@ -73,25 +76,23 @@ public class TurnDegrees extends CommandBase {
   public void execute() {
     double yaw = m_drive.getGyroAngleZ();
     SmartDashboard.putNumber("TurnDegrees/yaw", yaw);
-    double modYaw = yaw % 360;
+    double modYaw =(yaw % 360) / 180;
     SmartDashboard.putNumber("TurnDegrees/modyaw", modYaw);
     double pidOut = m_pidController.calculate(modYaw);
-    double correction = MathUtil.clamp(pidOut, -m_speed, m_speed);
-    // if (correction < 0 && correction > -floor) { 
-    //   correction = -floor;
-    // } else if (correction > 0 && correction < floor) {
-    //   correction = floor;
-    // }
+    double feedForward = Math.copySign(kF * m_speed, pidOut);
+    double correction = MathUtil.clamp(pidOut + feedForward, -m_speed, m_speed);
     SmartDashboard.putNumber("TurnDegrees/pidOut", pidOut);
+    SmartDashboard.putNumber("TurnDegrees/pError", m_pidController.getPositionError());
+    SmartDashboard.putNumber("TurnDegrees/dError", m_pidController.getVelocityError());
     SmartDashboard.putNumber("TurnDegrees/correction", correction);
 
-    m_drive.arcadeDrive(0, correction);
+    m_drive.setMotors(correction, -correction);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_drive.arcadeDrive(0, 0);
+    m_drive.setMotors(0, 0);
     SmartDashboard.putString("AutoStep", SmartDashboard.getString("AutoStep", "Unknown") + " Done");
   }
 
